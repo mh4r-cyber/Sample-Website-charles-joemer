@@ -1,0 +1,602 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#111522">
+        <title>Pixel Quest — Play, Explore, Level Up</title>
+        <style>
+            :root {
+                color-scheme: dark;
+                --bg: #111522;
+                --panel: #1b2031;
+                --text: #f7f7ff;
+                --muted: #a7aec4;
+                --purple: #a987ff;
+                --mint: #72f5c5;
+                --yellow: #ffd166;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                min-height: 100vh;
+                margin: 0;
+                background:
+                    radial-gradient(ellipse at 75% 15%, rgba(116, 87, 205, 0.18), transparent 34rem),
+                    radial-gradient(ellipse at 5% 75%, rgba(51, 184, 155, 0.1), transparent 30rem),
+                    var(--bg);
+                color: var(--text);
+                font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            }
+
+            button {
+                color: inherit;
+                font: inherit;
+            }
+
+            .page-shell {
+                width: min(1120px, calc(100% - 40px));
+                margin: 0 auto;
+            }
+
+            .topbar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                min-height: 82px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+            }
+
+            .brand {
+                display: inline-flex;
+                align-items: center;
+                gap: 11px;
+                color: var(--text);
+                font-size: 1.05rem;
+                font-weight: 850;
+                letter-spacing: 0.04em;
+                text-decoration: none;
+            }
+
+            .brand-mark {
+                display: grid;
+                width: 38px;
+                height: 38px;
+                place-items: center;
+                border: 1px solid rgba(169, 135, 255, 0.6);
+                border-radius: 12px;
+                background: rgba(169, 135, 255, 0.16);
+                color: var(--purple);
+                font-size: 1.2rem;
+            }
+
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: 28px;
+            }
+
+            .nav-links a {
+                color: var(--muted);
+                font-size: 0.9rem;
+                text-decoration: none;
+                transition: color 160ms ease;
+            }
+
+            .nav-links a:hover,
+            .nav-links a:focus-visible {
+                color: var(--text);
+            }
+
+            .profile-chip {
+                padding: 9px 14px;
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                border-radius: 999px;
+                color: var(--muted);
+                font-size: 0.85rem;
+            }
+
+            main {
+                padding: 74px 0 54px;
+            }
+
+            .hero {
+                display: grid;
+                grid-template-columns: 1.05fr 0.95fr;
+                align-items: center;
+                gap: 48px;
+            }
+
+            .eyebrow {
+                display: inline-flex;
+                align-items: center;
+                gap: 9px;
+                margin: 0 0 18px;
+                color: var(--mint);
+                font-size: 0.77rem;
+                font-weight: 800;
+                letter-spacing: 0.16em;
+                text-transform: uppercase;
+            }
+
+            .status-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: var(--mint);
+                box-shadow: 0 0 14px rgba(114, 245, 197, 0.9);
+            }
+
+            h1 {
+                max-width: 600px;
+                margin: 0;
+                font-size: clamp(2.8rem, 6vw, 5.3rem);
+                line-height: 0.99;
+                letter-spacing: -0.065em;
+            }
+
+            h1 span {
+                color: var(--purple);
+            }
+
+            .intro {
+                max-width: 490px;
+                margin: 22px 0 28px;
+                color: var(--muted);
+                font-size: 1.05rem;
+                line-height: 1.75;
+            }
+
+            .hero-actions {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 14px;
+            }
+
+            .button {
+                display: inline-flex;
+                min-height: 48px;
+                align-items: center;
+                justify-content: center;
+                gap: 9px;
+                padding: 0 19px;
+                border: 1px solid transparent;
+                border-radius: 12px;
+                cursor: pointer;
+                font-weight: 800;
+                text-decoration: none;
+                transition: transform 160ms ease, filter 160ms ease, background 160ms ease;
+            }
+
+            .button:hover {
+                filter: brightness(1.08);
+                transform: translateY(-2px);
+            }
+
+            .button:focus-visible,
+            .nav-links a:focus-visible,
+            .brand:focus-visible {
+                outline: 3px solid var(--yellow);
+                outline-offset: 3px;
+            }
+
+            .button-primary {
+                background: var(--purple);
+                box-shadow: 0 8px 26px rgba(169, 135, 255, 0.22);
+                color: #171326;
+            }
+
+            .button-secondary {
+                border-color: rgba(255, 255, 255, 0.15);
+                background: rgba(255, 255, 255, 0.04);
+                color: var(--text);
+            }
+
+            .game-card {
+                position: relative;
+                overflow: hidden;
+                padding: 25px;
+                border: 1px solid rgba(255, 255, 255, 0.11);
+                border-radius: 24px;
+                background: linear-gradient(145deg, rgba(37, 43, 62, 0.98), rgba(25, 30, 45, 0.98));
+                box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+            }
+
+            .game-card::before {
+                position: absolute;
+                top: -90px;
+                right: -75px;
+                width: 220px;
+                height: 220px;
+                border-radius: 50%;
+                background: rgba(169, 135, 255, 0.11);
+                content: "";
+                filter: blur(2px);
+            }
+
+            .card-heading,
+            .player-row,
+            .quest-row,
+            .stat-row {
+                position: relative;
+            }
+
+            .card-heading,
+            .quest-row,
+            .stat-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 14px;
+            }
+
+            .card-heading {
+                color: var(--muted);
+                font-size: 0.78rem;
+                font-weight: 800;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+            }
+
+            .live-badge {
+                padding: 6px 9px;
+                border: 1px solid rgba(114, 245, 197, 0.25);
+                border-radius: 999px;
+                background: rgba(114, 245, 197, 0.08);
+                color: var(--mint);
+                font-size: 0.68rem;
+                letter-spacing: 0.08em;
+            }
+
+            .player-row {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                margin: 25px 0 20px;
+            }
+
+            .avatar {
+                display: grid;
+                width: 58px;
+                height: 58px;
+                flex: 0 0 auto;
+                place-items: center;
+                border: 1px solid rgba(255, 209, 102, 0.45);
+                border-radius: 18px;
+                background: linear-gradient(145deg, #574575, #302a4a);
+                font-size: 1.8rem;
+            }
+
+            .player-copy {
+                flex: 1;
+            }
+
+            .player-copy strong {
+                display: block;
+                margin-bottom: 5px;
+                font-size: 1.05rem;
+            }
+
+            .player-copy span,
+            .level-label {
+                color: var(--muted);
+                font-size: 0.83rem;
+            }
+
+            .level-label {
+                align-self: flex-start;
+                color: var(--yellow);
+                font-weight: 800;
+            }
+
+            .xp-heading {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 9px;
+                color: var(--muted);
+                font-size: 0.8rem;
+            }
+
+            .xp-heading strong {
+                color: var(--text);
+            }
+
+            .progress-track {
+                height: 10px;
+                overflow: hidden;
+                border-radius: 99px;
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .progress-fill {
+                width: 0%;
+                height: 100%;
+                border-radius: inherit;
+                background: linear-gradient(90deg, var(--purple), #d0a6ff);
+                transition: width 300ms ease;
+            }
+
+            .quest-box {
+                margin-top: 24px;
+                padding: 17px;
+                border: 1px solid rgba(255, 255, 255, 0.09);
+                border-radius: 16px;
+                background: rgba(10, 13, 23, 0.28);
+            }
+
+            .quest-row {
+                margin-bottom: 13px;
+            }
+
+            .quest-title {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 0.91rem;
+                font-weight: 750;
+            }
+
+            .quest-icon {
+                font-size: 1.2rem;
+            }
+
+            .quest-reward {
+                color: var(--yellow);
+                font-size: 0.78rem;
+                font-weight: 800;
+                white-space: nowrap;
+            }
+
+            .button-collect {
+                width: 100%;
+                min-height: 42px;
+                background: rgba(114, 245, 197, 0.12);
+                color: var(--mint);
+            }
+
+            .button-collect:disabled {
+                cursor: default;
+                opacity: 0.65;
+                transform: none;
+            }
+
+            .stat-row {
+                margin-top: 19px;
+                color: var(--muted);
+                font-size: 0.8rem;
+            }
+
+            .stat-row strong {
+                color: var(--text);
+            }
+
+            .features {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+                margin-top: 76px;
+            }
+
+            .feature {
+                padding: 21px;
+                border: 1px solid rgba(255, 255, 255, 0.09);
+                border-radius: 17px;
+                background: rgba(27, 32, 49, 0.67);
+            }
+
+            .feature-icon {
+                display: grid;
+                width: 38px;
+                height: 38px;
+                margin-bottom: 16px;
+                place-items: center;
+                border-radius: 12px;
+                background: rgba(169, 135, 255, 0.12);
+                font-size: 1.1rem;
+            }
+
+            .feature h2 {
+                margin: 0 0 8px;
+                font-size: 1rem;
+            }
+
+            .feature p {
+                margin: 0;
+                color: var(--muted);
+                font-size: 0.88rem;
+                line-height: 1.6;
+            }
+
+            footer {
+                padding: 25px 0 32px;
+                border-top: 1px solid rgba(255, 255, 255, 0.09);
+                color: var(--muted);
+                font-size: 0.8rem;
+                text-align: center;
+            }
+
+            @media (max-width: 760px) {
+                .nav-links {
+                    gap: 16px;
+                }
+
+                .nav-links a:not(:last-child) {
+                    display: none;
+                }
+
+                main {
+                    padding-top: 52px;
+                }
+
+                .hero {
+                    grid-template-columns: 1fr;
+                    gap: 38px;
+                }
+
+                .features {
+                    margin-top: 48px;
+                }
+            }
+
+            @media (max-width: 520px) {
+                .page-shell {
+                    width: min(100% - 28px, 1120px);
+                }
+
+                .topbar {
+                    min-height: 70px;
+                }
+
+                .profile-chip {
+                    padding: 8px 10px;
+                    font-size: 0.76rem;
+                }
+
+                .features {
+                    grid-template-columns: 1fr;
+                }
+
+                .game-card {
+                    padding: 19px;
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                *,
+                *::before,
+                *::after {
+                    scroll-behavior: auto !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="page-shell">
+            <header class="topbar">
+                <a class="brand" href="#" aria-label="Pixel Quest home">
+                    <span class="brand-mark" aria-hidden="true">✦</span>
+                    PIXEL QUEST
+                </a>
+                <nav class="nav-links" aria-label="Main navigation">
+                    <a href="#quests">Quests</a>
+                    <a href="#features">How to play</a>
+                    <span class="profile-chip">🎮 Player mode</span>
+                </nav>
+            </header>
+
+            <main>
+                <section class="hero" aria-labelledby="hero-title">
+                    <div>
+                        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Your next adventure starts here</p>
+                        <h1 id="hero-title">Make every day a <span>new quest.</span></h1>
+                        <p class="intro">Explore a world built for curious minds. Take on fun challenges, earn XP, and level up one little victory at a time.</p>
+                        <div class="hero-actions">
+                            <a class="button button-primary" href="#quests">Start your quest <span aria-hidden="true">→</span></a>
+                            <a class="button button-secondary" href="#features">Discover the game</a>
+                        </div>
+                    </div>
+
+                    <section class="game-card" id="quests" aria-labelledby="quest-card-title">
+                        <div class="card-heading">
+                            <span id="quest-card-title">Adventurer card</span>
+                            <span class="live-badge">● READY TO PLAY</span>
+                        </div>
+
+                        <div class="player-row">
+                            <div class="avatar" aria-hidden="true">🧙</div>
+                            <div class="player-copy">
+                                <strong>Rookie Adventurer</strong>
+                                <span>Your journey is just beginning</span>
+                            </div>
+                            <span class="level-label">LVL <span id="level">1</span></span>
+                        </div>
+
+                        <div class="xp-heading">
+                            <span>Experience points</span>
+                            <strong><span id="xp">0</span> / 100 XP</strong>
+                        </div>
+                        <div class="progress-track" role="progressbar" aria-label="Experience points" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="xp-progress">
+                            <div class="progress-fill" id="xp-fill"></div>
+                        </div>
+
+                        <div class="quest-box">
+                            <div class="quest-row">
+                                <span class="quest-title"><span class="quest-icon" aria-hidden="true">🪙</span> Collect your first XP</span>
+                                <span class="quest-reward">+25 XP</span>
+                            </div>
+                            <button class="button button-collect" id="collect-button" type="button">Complete quest</button>
+                        </div>
+
+                        <div class="stat-row">
+                            <span>Quests completed</span>
+                            <strong id="quest-count">0</strong>
+                        </div>
+                    </section>
+                </section>
+
+                <section class="features" id="features" aria-label="Game features">
+                    <article class="feature">
+                        <div class="feature-icon" aria-hidden="true">🗺️</div>
+                        <h2>Explore at your pace</h2>
+                        <p>Every great adventure starts with one small step. Pick a challenge that feels right for you.</p>
+                    </article>
+                    <article class="feature">
+                        <div class="feature-icon" aria-hidden="true">✨</div>
+                        <h2>Celebrate progress</h2>
+                        <p>Earn experience for each quest and watch your player level grow as you keep showing up.</p>
+                    </article>
+                    <article class="feature">
+                        <div class="feature-icon" aria-hidden="true">🏆</div>
+                        <h2>Build your streak</h2>
+                        <p>Turn good habits into a game, collect wins, and make your next milestone your best one yet.</p>
+                    </article>
+                </section>
+            </main>
+
+            <footer>Built for curious adventurers. Let the good quests begin!</footer>
+        </div>
+
+        <script>
+            const xpGoal = 100;
+            let xp = 0;
+            let level = 1;
+            let questsCompleted = 0;
+
+            const xpText = document.getElementById("xp");
+            const levelText = document.getElementById("level");
+            const questCount = document.getElementById("quest-count");
+            const xpFill = document.getElementById("xp-fill");
+            const xpProgress = document.getElementById("xp-progress");
+            const collectButton = document.getElementById("collect-button");
+
+            collectButton.addEventListener("click", () => {
+                if (collectButton.disabled) return;
+
+                xp += 25;
+                questsCompleted += 1;
+                if (xp >= xpGoal) {
+                    xp = 0;
+                    level += 1;
+                }
+
+                xpText.textContent = xp;
+                levelText.textContent = level;
+                questCount.textContent = questsCompleted;
+                xpFill.style.width = `${xp}%`;
+                xpProgress.setAttribute("aria-valuenow", xp);
+                collectButton.textContent = "Quest complete! +25 XP";
+                collectButton.disabled = true;
+
+                window.setTimeout(() => {
+                    collectButton.textContent = "Complete quest";
+                    collectButton.disabled = false;
+                }, 1200);
+            });
+        </script>
+    </body>
+    </html>
